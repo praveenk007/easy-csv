@@ -2,8 +2,6 @@ package utils;
 
 import annotations.CSVHeader;
 import annotations.CSVHeaderPosition;
-
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -27,7 +25,9 @@ public class EasyCSV {
         sortFields(fields);
         StringBuilder sb = new StringBuilder();
         if(applyHeader) {
-            addHeader(sb, fields);
+            String header = getHeader(fields);
+            System.out.println("Headers : " + header);
+            sb.append(header).append(NEW_LINE);
         }
         sb.append(appendToSb(objs, fields, false));
         return Base64.getEncoder().encodeToString(sb.toString().getBytes());
@@ -56,8 +56,36 @@ public class EasyCSV {
         return "\"" + csv +"\"";
     }
 
-    private void addHeader(StringBuilder sb, Field[] fields) {
-        sb.append(Arrays.stream(fields).map(f -> f.getAnnotation(CSVHeader.class).value()).collect(Collectors.joining(del))).append("\n");
+    //TODO create getHeader method
+
+    private String getHeader(Field[] fields) {
+        StringBuilder sb = new StringBuilder();
+        addHeader(sb, fields, true);
+        return sb.substring(0, sb.length() - 2);
+    }
+
+    private void addHeader(StringBuilder sb, Field[] fields, boolean isSuperClassFields) {
+        if(!isSuperClassFields) {
+            //Sort nested object fields
+            sortFields(fields);
+        }
+        for(Field field: fields) {
+            if(field.getType() == List.class) {
+                ParameterizedType type = (ParameterizedType) field.getGenericType();
+                Class clazz = (Class) type.getActualTypeArguments()[0];
+                if(clazz.getName().startsWith("java.lang")) {
+                    sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
+                } else {
+                    //List<CustomObject>
+                    addHeader(sb, clazz.getDeclaredFields(), false);
+                }
+                Field[] childObjectFields = ((Class)clazz).getDeclaredFields();
+            } else if(field.getType().isPrimitive() || field.getType().getClass().getName().startsWith("java.lang")) {
+                sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
+            } else {
+                //Custom java object
+            }
+        }
     }
 
     private String getFieldVal(Field field, Object obj) {
