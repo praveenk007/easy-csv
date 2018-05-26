@@ -72,7 +72,6 @@ public class EasyCSV {
     }
 
     private void addHeader(StringBuilder sb, Field[] fields, boolean isSuperClassFields) {
-        Arrays.toString(fields);
         if(!isSuperClassFields) {
             //Sort nested object fields
             sortFields(fields);
@@ -87,12 +86,11 @@ public class EasyCSV {
                     //List<CustomObject>
                     addHeader(sb, clazz.getDeclaredFields(), false);
                 }
-                Field[] childObjectFields = ((Class)clazz).getDeclaredFields();
             } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
                 sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
             } else {
                 //Custom java object
-                addHeader(sb, ((Class) field.getType()).getDeclaredFields(), false);
+                addHeader(sb, field.getType().getDeclaredFields(), false);
             }
         }
     }
@@ -102,8 +100,8 @@ public class EasyCSV {
             field.setAccessible(true);
             if(field.getType() == List.class) {
                 ParameterizedType type = (ParameterizedType) field.getGenericType();
-                Type clazz = type.getActualTypeArguments()[0];
                 if(type != null) {
+                    Type clazz = type.getActualTypeArguments()[0];
                     if(String.class == clazz) { //List<String>
                         return  getFeildValWithQualifier(((List<String>) field.get(obj)).stream().collect(Collectors.joining(del)));
                     } else if(Number.class == ((Class)clazz).getSuperclass()) { //List<Number>
@@ -118,9 +116,9 @@ public class EasyCSV {
                 return field.get(obj).toString();
             } else {
                 //custom
-                Field[] fields = ((Class)field.getType()).getDeclaredFields();
+                Field[] fields = field.getType().getDeclaredFields();
                 sortFields(fields);
-                return convertToCsv(((Object) field.get(obj)), fields, true).toString();
+                return convertToCsv(field.get(obj), fields, true).toString();
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -135,11 +133,9 @@ public class EasyCSV {
                 CSVHeaderPosition or2 = f2.getAnnotation(CSVHeaderPosition.class);
                 if (or1 != null && or2 != null) {
                     return or1.value() - or2.value();
-                } else
-                if (or1 != null && or2 == null) {
+                } else if (or1 != null && or2 == null) {
                     return -1;
-                } else
-                if (or1 == null && or2 != null) {
+                } else if (or1 == null && or2 != null) {
                     return 1;
                 }
                 return 0;
