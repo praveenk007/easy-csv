@@ -3,7 +3,6 @@ package com.easycsv.utils;
 import com.easycsv.annotations.CSVHeader;
 import com.easycsv.annotations.CSVHeaderPosition;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,33 +22,41 @@ public class EasyCSV {
     public String write(List<Object> objs, boolean applyHeader) {
         Class clazz = objs.get(0).getClass();
         Field[] fields = clazz.getDeclaredFields();
-        System.out.println(Arrays.toString(fields));
         sortFields(fields);
         StringBuilder sb = new StringBuilder();
         if(applyHeader) {
             String header = getHeader(fields);
-            System.out.println("Headers : " + header);
             sb.append(header).append(NEW_LINE);
         }
-        sb.append(appendToSb(objs, fields, false));
+        sb.append(convertToCsv(objs, fields, false));
         return Base64.getEncoder().encodeToString(sb.toString().getBytes());
 
     }
 
-    private StringBuilder appendToSb(List<Object> objs, Field[] fields, boolean isNestedObject) {
+    private StringBuilder convertToCsv(Object obj, Field[] fields, boolean isNestedObject) {
+        StringBuilder sb = new StringBuilder();
+        appendDataToCsv(sb, obj, fields, isNestedObject);
+        return sb;
+    }
+
+    private StringBuilder convertToCsv(List<Object> objs, Field[] fields, boolean isNestedObject) {
         StringBuilder sb = new StringBuilder();
         for(Object obj: objs) {
-            try {
-                sb.append(stringifyObjectFields(obj, fields));
-                if(!isNestedObject)
-                    sb.append(NEW_LINE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            appendDataToCsv(sb, obj, fields, isNestedObject);
         }
         return sb;
     }
 
+
+    private void appendDataToCsv(StringBuilder sb, Object obj, Field[] fields, boolean isNestedObject) {
+        try {
+            sb.append(stringifyObjectFields(obj, fields));
+            if(!isNestedObject)
+                sb.append(NEW_LINE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private String stringifyObjectFields(Object obj, Field[] fields) {
         return Arrays.stream(fields).map(f -> getFieldVal(f, obj)).collect(Collectors.joining(del));
     }
@@ -82,10 +89,8 @@ public class EasyCSV {
                 }
                 Field[] childObjectFields = ((Class)clazz).getDeclaredFields();
             } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
-                System.out.println(field.getType() + " " + field.getName());
                 sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
             } else {
-                System.out.println("custom");
                 //Custom java object
                 addHeader(sb, ((Class) field.getType()).getDeclaredFields(), false);
             }
@@ -106,14 +111,21 @@ public class EasyCSV {
                     } else { //List<CustomObject>
                         Field[] fields = ((Class)clazz).getDeclaredFields();
                         sortFields(fields);
-                        return appendToSb(((List<Object>) field.get(obj)), fields, true).toString();
+                        return convertToCsv(((List<Object>) field.get(obj)), fields, true).toString();
                     }
                 }
-            } return field.get(obj).toString();
+            } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
+                return field.get(obj).toString();
+            } else {
+                //custom
+                Field[] fields = ((Class)field.getType()).getDeclaredFields();
+                sortFields(fields);
+                return convertToCsv(((Object) field.get(obj)), fields, true).toString();
+            }
         } catch(Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return  null;
     }
     private static void sortFields(Field[] fields) {
         Arrays.sort(fields, new Comparator<Field>() {

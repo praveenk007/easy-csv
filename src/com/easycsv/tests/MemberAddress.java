@@ -5,12 +5,12 @@ import com.easycsv.annotations.CSVHeaderPosition;
 
 public class MemberAddress {
 
-    @CSVHeaderPosition(value = 1)
-    @CSVHeader(value = "Line 1")
+    @CSVHeaderPosition(value = 2)
+    @CSVHeader(value = "Address line 1")
     private String line1;
 
-    @CSVHeaderPosition(value = 2)
-    @CSVHeader(value = "Line 2")
+    @CSVHeaderPosition(value = 1)
+    @CSVHeader(value = "Address line 2")
     private String line2;
 
 
