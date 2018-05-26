@@ -69,7 +69,7 @@ public class EasyCSV {
     private String getHeader(Field[] fields) {
         StringBuilder sb = new StringBuilder();
         addHeader(sb, fields, true);
-        return sb.substring(0, sb.length() - 2);
+        return sb.substring(0, sb.length() - 1);
     }
 
     private void addHeader(StringBuilder sb, Field[] fields, boolean isSuperClassFields) {
@@ -115,11 +115,11 @@ public class EasyCSV {
                 }
             } else if(field.getType().isArray()) {
                 Class clazz = field.getType().getComponentType();
-                if(clazz.isPrimitive() || String.class == clazz) {
+                if(clazz.isPrimitive() || String.class == clazz || Number.class == clazz.getSuperclass()) {
                     return getFeildValWithQualifier(convertArrayPrimitiveToCsv(field, obj));
+                } else {
+
                 }
-                System.out.println();
-                //return Arrays.toString(field.get(obj));
             } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
                 return field.get(obj).toString();
             } else {
@@ -141,7 +141,7 @@ public class EasyCSV {
             Object arrayObj = field.get(object);
             for(int index = 0; index < Array.getLength(arrayObj); index++) {
                 sb.append(Array.get(arrayObj, index)).append(del);
-            } return  sb.toString().substring(0, sb.length() - 2);
+            } return  sb.toString().substring(0, sb.length() - 1);
         } catch (Exception e) {
             return null;
         }

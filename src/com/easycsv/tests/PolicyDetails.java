@@ -16,6 +16,18 @@ public class PolicyDetails {
     @CSVHeader(value = "Amounts")
     public int[] amounts;
 
+    @CSVHeaderPosition(value = 7)
+    @CSVHeader(value = "Floating amounts")
+    public Float[] floaters;
+
+    public Float[] getFloaters() {
+        return floaters;
+    }
+
+    public void setFloaters(Float[] floaters) {
+        this.floaters = floaters;
+    }
+
     public int[] getAmounts() {
         return amounts;
     }
