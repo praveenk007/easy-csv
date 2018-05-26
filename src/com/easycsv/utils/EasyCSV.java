@@ -2,7 +2,6 @@ package com.easycsv.utils;
 
 import com.easycsv.annotations.CSVHeader;
 import com.easycsv.annotations.CSVHeaderPosition;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -86,7 +85,7 @@ public class EasyCSV {
                     //List<CustomObject>
                     addHeader(sb, clazz.getDeclaredFields(), false);
                 }
-            } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
+            } else if(field.getType().isArray() || field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
                 sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
             } else {
                 //Custom java object

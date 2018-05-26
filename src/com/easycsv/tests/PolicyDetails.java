@@ -7,6 +7,10 @@ import java.util.List;
 
 public class PolicyDetails {
 
+    @CSVHeaderPosition(value = 5)
+    @CSVHeader(value = "Diseases")
+    public String[] diseases;
+
     @CSVHeaderPosition(value = 1)
     @CSVHeader(value = "Policy number")
     public String policyNum;
@@ -101,5 +105,14 @@ public class PolicyDetails {
 
     public void setlName(String lName) {
         this.lName = lName;
+    }
+
+
+    public String[] getDiseases() {
+        return diseases;
+    }
+
+    public void setDiseases(String[] diseases) {
+        this.diseases = diseases;
     }
 }
