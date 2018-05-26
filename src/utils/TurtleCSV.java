@@ -29,17 +29,18 @@ public class TurtleCSV {
         if(applyHeader) {
             addHeader(sb, fields);
         }
-        sb.append(appendToSb(objs, fields));
+        sb.append(appendToSb(objs, fields, false));
         return Base64.getEncoder().encodeToString(sb.toString().getBytes());
 
     }
 
-    private StringBuilder appendToSb(List<Object> objs, Field[] fields) {
+    private StringBuilder appendToSb(List<Object> objs, Field[] fields, boolean isNestedObject) {
         StringBuilder sb = new StringBuilder();
         for(Object obj: objs) {
             try {
                 sb.append(stringifyObjectFields(obj, fields));
-                sb.append(NEW_LINE);
+                if(!isNestedObject)
+                    sb.append(NEW_LINE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -61,28 +62,22 @@ public class TurtleCSV {
 
     private String getFieldVal(Field field, Object obj) {
         try {
+            field.setAccessible(true);
             if(field.getType() == List.class) {
                 ParameterizedType type = (ParameterizedType) field.getGenericType();
                 Type clazz = type.getActualTypeArguments()[0];
-                //System.out.println(((Class)clazz).getSuperclass());
                 if(type != null) {
                     if(String.class == clazz) { //List<String>
                         return  getFeildValWithQualifier(((List<String>) field.get(obj)).stream().collect(Collectors.joining(del)));
                     } else if(Number.class == ((Class)clazz).getSuperclass()) { //List<Number>
                         return  getFeildValWithQualifier(((List<Number>) field.get(obj)).stream().map(val -> String.valueOf(val)).collect(Collectors.joining(del)));
-                    } else { //Direct  or in-direct child of Object
-                        Class nestedObjClazz = (Class)clazz;
-                        System.out.println(nestedObjClazz);
-                        Field[] fields = nestedObjClazz.getDeclaredFields();
+                    } else { //List<CustomObject>
+                        Field[] fields = ((Class)clazz).getDeclaredFields();
                         sortFields(fields);
-                        StringBuilder sbb = appendToSb(((List<Object>) field.get(obj)), fields);
-                        System.out.println("neted : " + sbb.toString());
-                        return  sbb.toString();
+                        return appendToSb(((List<Object>) field.get(obj)), fields, true).toString();
                     }
                 }
-            }
-            field.setAccessible(true);
-            return field.get(obj).toString();
+            } return field.get(obj).toString();
         } catch(Exception e) {
             e.printStackTrace();
             return null;
