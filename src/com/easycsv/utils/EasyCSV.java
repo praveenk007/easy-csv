@@ -91,9 +91,10 @@ public class EasyCSV {
             } else if(field.getType().isPrimitive() || type.getName().startsWith("java.lang") || (type.isArray() && (type.getComponentType().isPrimitive() || Number.class == type.getComponentType().getSuperclass() || String.class == type.getComponentType()))) {
                 sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
             } else if(type.isArray() && !type.getComponentType().isPrimitive()) {
+                //CustomObject[]
                 addHeader(sb, type.getComponentType().getDeclaredFields(), false);
             } else {
-                //Custom java object
+                //CustomObject
                 addHeader(sb, field.getType().getDeclaredFields(), false);
             }
         }
