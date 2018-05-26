@@ -32,6 +32,7 @@ public class CsvTest {
         m1.setFname("praveen");
         m1.setLname("kamath");
         List<Member> members = new ArrayList();
+        members.add(m1);
         pd1.setMemebers(members);
         pd1.setAges(ages);
 

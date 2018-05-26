@@ -43,7 +43,7 @@ public class PolicyDetails {
     @CSVHeaderPosition(value = 6)
     public List<Double> policyPremiums;
 
-    @CSVHeader(value = "Policy premiums")
+    @CSVHeader(value = "Policy members")
     @CSVHeaderPosition(value = 7)
     public List<Member> memebers;
 

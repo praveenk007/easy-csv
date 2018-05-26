@@ -2,6 +2,8 @@ package utils;
 
 import annotations.CSVHeader;
 import annotations.CSVHeaderPosition;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -27,47 +29,62 @@ public class TurtleCSV {
         if(applyHeader) {
             addHeader(sb, fields);
         }
-        return appendToSb(objs, sb, fields);
+        sb.append(appendToSb(objs, fields));
+        return Base64.getEncoder().encodeToString(sb.toString().getBytes());
 
     }
 
-    private String appendToSb(List<Object> objs, StringBuilder sb, Field[] fields) {
+    private StringBuilder appendToSb(List<Object> objs, Field[] fields) {
+        StringBuilder sb = new StringBuilder();
         for(Object obj: objs) {
             try {
-                sb.append(Arrays.stream(fields).map(f -> "\"" + getFieldVal(f, obj, sb) +"\"").collect(Collectors.joining(del)));
+                sb.append(stringifyObjectFields(obj, fields));
                 sb.append(NEW_LINE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } return Base64.getEncoder().encodeToString(sb.toString().getBytes());
+        }
+        return sb;
+    }
+
+    private String stringifyObjectFields(Object obj, Field[] fields) {
+        return Arrays.stream(fields).map(f -> getFieldVal(f, obj)).collect(Collectors.joining(del));
+    }
+
+    private String getFeildValWithQualifier(String csv) {
+        return "\"" + csv +"\"";
     }
 
     private void addHeader(StringBuilder sb, Field[] fields) {
         sb.append(Arrays.stream(fields).map(f -> f.getAnnotation(CSVHeader.class).value()).collect(Collectors.joining(del))).append("\n");
     }
 
-    private String getFieldVal(Field field, Object obj, StringBuilder sb) {
+    private String getFieldVal(Field field, Object obj) {
         try {
             if(field.getType() == List.class) {
                 ParameterizedType type = (ParameterizedType) field.getGenericType();
-                Type clazz =type.getActualTypeArguments()[0];
+                Type clazz = type.getActualTypeArguments()[0];
                 //System.out.println(((Class)clazz).getSuperclass());
                 if(type != null) {
                     if(String.class == clazz) { //List<String>
-                        return  ((List<String>) field.get(obj)).stream().collect(Collectors.joining(del));
+                        return  getFeildValWithQualifier(((List<String>) field.get(obj)).stream().collect(Collectors.joining(del)));
                     } else if(Number.class == ((Class)clazz).getSuperclass()) { //List<Number>
-                        return  ((List<Number>) field.get(obj)).stream().map(val -> String.valueOf(val)).collect(Collectors.joining(del));
+                        return  getFeildValWithQualifier(((List<Number>) field.get(obj)).stream().map(val -> String.valueOf(val)).collect(Collectors.joining(del)));
                     } else { //Direct  or in-direct child of Object
-                        List<Object> nestedObject = ((List<Object>) field.get(obj));
-                        Class nestedObjClazz = nestedObject.get(0).getClass();
+                        Class nestedObjClazz = (Class)clazz;
+                        System.out.println(nestedObjClazz);
                         Field[] fields = nestedObjClazz.getDeclaredFields();
-                        appendToSb(nestedObject, sb, fields);
+                        sortFields(fields);
+                        StringBuilder sbb = appendToSb(((List<Object>) field.get(obj)), fields);
+                        System.out.println("neted : " + sbb.toString());
+                        return  sbb.toString();
                     }
                 }
             }
             field.setAccessible(true);
             return field.get(obj).toString();
         } catch(Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

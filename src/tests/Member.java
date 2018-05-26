@@ -5,12 +5,12 @@ import annotations.CSVHeaderPosition;
 
 public class Member {
 
-    @CSVHeaderPosition(value = 1)
-    @CSVHeader(value = "First name")
+    @CSVHeaderPosition(value = 3)
+    @CSVHeader(value = "Member First name")
     private String fname;
 
     @CSVHeaderPosition(value = 2)
-    @CSVHeader(value = "Last name")
+    @CSVHeader(value = "Member Last name")
     private String lname;
 
     public String getFname() {
