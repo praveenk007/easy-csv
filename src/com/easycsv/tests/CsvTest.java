@@ -27,7 +27,9 @@ public class CsvTest {
         previousPolicies.add("pol3");
         previousPolicies.add("pol4");
         String[] diseases = {"dis1", "dis2"};
+        int[] amounts = {1144, 2222};
         pd1.setDiseases(diseases);
+        pd1.setAmounts(amounts);
         pd1.setPreviousPolicies(previousPolicies);
         List<Integer> ages = new ArrayList<>();
         ages.add(10);

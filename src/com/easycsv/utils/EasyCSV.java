@@ -2,6 +2,8 @@ package com.easycsv.utils;
 
 import com.easycsv.annotations.CSVHeader;
 import com.easycsv.annotations.CSVHeaderPosition;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -111,6 +113,13 @@ public class EasyCSV {
                         return convertToCsv(((List<Object>) field.get(obj)), fields, true).toString();
                     }
                 }
+            } else if(field.getType().isArray()) {
+                Class clazz = field.getType().getComponentType();
+                if(clazz.isPrimitive() || String.class == clazz) {
+                    return getFeildValWithQualifier(convertArrayPrimitiveToCsv(field, obj));
+                }
+                System.out.println();
+                //return Arrays.toString(field.get(obj));
             } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
                 return field.get(obj).toString();
             } else {
@@ -123,6 +132,19 @@ public class EasyCSV {
             e.printStackTrace();
         }
         return  null;
+    }
+
+    private String convertArrayPrimitiveToCsv(Field field, Object object) {
+        StringBuilder sb;
+        try {
+            sb = new StringBuilder();
+            Object arrayObj = field.get(object);
+            for(int index = 0; index < Array.getLength(arrayObj); index++) {
+                sb.append(Array.get(arrayObj, index)).append(del);
+            } return  sb.toString().substring(0, sb.length() - 2);
+        } catch (Exception e) {
+            return null;
+        }
     }
     private static void sortFields(Field[] fields) {
         Arrays.sort(fields, new Comparator<Field>() {

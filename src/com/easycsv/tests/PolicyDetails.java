@@ -11,6 +11,19 @@ public class PolicyDetails {
     @CSVHeader(value = "Diseases")
     public String[] diseases;
 
+
+    @CSVHeaderPosition(value = 6)
+    @CSVHeader(value = "Amounts")
+    public int[] amounts;
+
+    public int[] getAmounts() {
+        return amounts;
+    }
+
+    public void setAmounts(int[] amounts) {
+        this.amounts = amounts;
+    }
+
     @CSVHeaderPosition(value = 1)
     @CSVHeader(value = "Policy number")
     public String policyNum;
