@@ -1,7 +1,7 @@
-package utils;
+package com.easycsv.utils;
 
-import annotations.CSVHeader;
-import annotations.CSVHeaderPosition;
+import com.easycsv.annotations.CSVHeader;
+import com.easycsv.annotations.CSVHeaderPosition;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

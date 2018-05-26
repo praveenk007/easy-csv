@@ -1,7 +1,7 @@
-package tests;
+package com.easycsv.tests;
 
-import annotations.CSVHeader;
-import annotations.CSVHeaderPosition;
+import com.easycsv.annotations.CSVHeader;
+import com.easycsv.annotations.CSVHeaderPosition;
 
 public class Member {
 

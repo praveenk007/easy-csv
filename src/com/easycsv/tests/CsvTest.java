@@ -1,6 +1,6 @@
-package tests;
+package com.easycsv.tests;
 
-import utils.EasyCSV;
+import com.easycsv.utils.EasyCSV;
 
 import java.io.File;
 import java.io.FileWriter;
