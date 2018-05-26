@@ -78,17 +78,20 @@ public class EasyCSV {
             sortFields(fields);
         }
         for(Field field: fields) {
-            if(field.getType() == List.class) {
-                ParameterizedType type = (ParameterizedType) field.getGenericType();
-                Class clazz = (Class) type.getActualTypeArguments()[0];
+            Class type= field.getType();
+            if(List.class == type) {
+                ParameterizedType pType = (ParameterizedType) field.getGenericType();
+                Class clazz = (Class) pType.getActualTypeArguments()[0];
                 if(clazz.getName().startsWith("java.lang")) {
                     sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
                 } else {
                     //List<CustomObject>
                     addHeader(sb, clazz.getDeclaredFields(), false);
                 }
-            } else if(field.getType().isArray() || field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
+            } else if(field.getType().isPrimitive() || type.getName().startsWith("java.lang") || (type.isArray() && (type.getComponentType().isPrimitive() || Number.class == type.getComponentType().getSuperclass() || String.class == type.getComponentType()))) {
                 sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
+            } else if(type.isArray() && !type.getComponentType().isPrimitive()) {
+                addHeader(sb, type.getComponentType().getDeclaredFields(), false);
             } else {
                 //Custom java object
                 addHeader(sb, field.getType().getDeclaredFields(), false);
@@ -118,7 +121,10 @@ public class EasyCSV {
                 if(clazz.isPrimitive() || String.class == clazz || Number.class == clazz.getSuperclass()) {
                     return getFeildValWithQualifier(convertArrayPrimitiveToCsv(field, obj));
                 } else {
-
+                    //CustomObject[]
+                    Field[] fields = ((Class)clazz).getDeclaredFields();
+                    sortFields(fields);
+                    return convertToCsv(Array.get(field.get(obj), 0), fields, true).toString();
                 }
             } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
                 return field.get(obj).toString();

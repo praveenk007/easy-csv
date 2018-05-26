@@ -45,6 +45,10 @@ public class CsvTest {
         m1.setFname("praveen");
         m1.setLname("kamath");
         m1.setContactNumber("9869390062");
+
+        Member[] memberArray = {m1};
+        pd1.setMemberArray(memberArray);
+
         List<Member> members = new ArrayList();
         members.add(m1);
         pd1.setMemebers(members);

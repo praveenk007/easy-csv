@@ -11,10 +11,21 @@ public class PolicyDetails {
     @CSVHeader(value = "Diseases")
     public String[] diseases;
 
+    @CSVHeaderPosition(value = 10)
+    @CSVHeader(value = "Member array")
+    Member[] memberArray;
 
     @CSVHeaderPosition(value = 6)
     @CSVHeader(value = "Amounts")
     public int[] amounts;
+
+    public Member[] getMemberArray() {
+        return memberArray;
+    }
+
+    public void setMemberArray(Member[] memberArray) {
+        this.memberArray = memberArray;
+    }
 
     @CSVHeaderPosition(value = 7)
     @CSVHeader(value = "Floating amounts")
