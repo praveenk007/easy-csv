@@ -32,8 +32,13 @@ public class CsvTest {
         ages.add(20);
         ages.add(30);
         Member m1 = new Member();
+        MemberAddress add = new MemberAddress();
+        add.setLine1("line1 address");
+        add.setLine2("line2 address");
+        m1.setAddress(add);
         m1.setFname("praveen");
         m1.setLname("kamath");
+        m1.setContactNumber("9869390062");
         List<Member> members = new ArrayList();
         members.add(m1);
         pd1.setMemebers(members);

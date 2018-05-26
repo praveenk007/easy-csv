@@ -2,6 +2,8 @@ package com.easycsv.utils;
 
 import com.easycsv.annotations.CSVHeader;
 import com.easycsv.annotations.CSVHeaderPosition;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -56,8 +58,6 @@ public class EasyCSV {
         return "\"" + csv +"\"";
     }
 
-    //TODO create getHeader method
-
     private String getHeader(Field[] fields) {
         StringBuilder sb = new StringBuilder();
         addHeader(sb, fields, true);
@@ -65,6 +65,7 @@ public class EasyCSV {
     }
 
     private void addHeader(StringBuilder sb, Field[] fields, boolean isSuperClassFields) {
+        Arrays.toString(fields);
         if(!isSuperClassFields) {
             //Sort nested object fields
             sortFields(fields);
@@ -80,10 +81,13 @@ public class EasyCSV {
                     addHeader(sb, clazz.getDeclaredFields(), false);
                 }
                 Field[] childObjectFields = ((Class)clazz).getDeclaredFields();
-            } else if(field.getType().isPrimitive() || field.getType().getClass().getName().startsWith("java.lang")) {
+            } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
+                System.out.println(field.getType() + " " + field.getName());
                 sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
             } else {
+                System.out.println("custom");
                 //Custom java object
+                addHeader(sb, ((Class) field.getType()).getDeclaredFields(), false);
             }
         }
     }
@@ -112,7 +116,6 @@ public class EasyCSV {
         }
     }
     private static void sortFields(Field[] fields) {
-        System.out.println("Sorting ...");
         Arrays.sort(fields, new Comparator<Field>() {
             @Override
             public int compare(Field f1, Field f2) {
