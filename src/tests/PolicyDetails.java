@@ -40,11 +40,11 @@ public class PolicyDetails {
     public List<Integer> ages;
 
     @CSVHeader(value = "Policy premiums")
-    @CSVHeaderPosition(value = 6)
+    @CSVHeaderPosition(value = 7)
     public List<Double> policyPremiums;
 
     @CSVHeader(value = "Policy members")
-    @CSVHeaderPosition(value = 7)
+    @CSVHeaderPosition(value = 6)
     public List<Member> memebers;
 
     public List<Member> getMemebers() {

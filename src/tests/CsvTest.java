@@ -1,6 +1,6 @@
 package tests;
 
-import utils.TurtleCSV;
+import utils.EasyCSV;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,7 +11,7 @@ import java.util.List;
 public class CsvTest {
 
     public static void main(String args[]) {
-        TurtleCSV t = new TurtleCSV(",");
+        EasyCSV t = new EasyCSV(",");
 
         PolicyDetails pd1 = new PolicyDetails();
         pd1.setfName("praveen");

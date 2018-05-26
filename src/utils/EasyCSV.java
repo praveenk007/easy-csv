@@ -10,13 +10,13 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TurtleCSV {
+public class EasyCSV {
 
     private String del;
 
     private static final String NEW_LINE    =   "\n";
 
-    public TurtleCSV(String del) {
+    public EasyCSV(String del) {
         this.del = del;
     }
 
