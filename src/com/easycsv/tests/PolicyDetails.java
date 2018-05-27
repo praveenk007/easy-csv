@@ -55,8 +55,8 @@ public class PolicyDetails {
     @CSVHeaderPosition(value = 3)
     public String fName;
 
-    @CSVHeader(value = "Age")
-    @CSVHeaderPosition(value = 2)
+    //@CSVHeader(value = "Age")
+    //@CSVHeaderPosition(value = 2)
     private int age;
 
     @CSVHeader(value = "Last name")

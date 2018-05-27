@@ -58,7 +58,11 @@ public class EasyCSV {
         }
     }
     private String stringifyObjectFields(Object obj, Field[] fields) {
-        return Arrays.stream(fields).map(f -> getFieldVal(f, obj)).collect(Collectors.joining(del));
+        return Arrays.stream(fields)
+                .filter(f -> f.getAnnotation(CSVHeader.class) != null ||
+                        f.getAnnotation(CSVHeaderPosition.class) != null)
+                .map(f -> getFieldVal(f, obj))
+                .collect(Collectors.joining(del));
     }
 
     private String getFeildValWithQualifier(String csv) {
@@ -82,13 +86,21 @@ public class EasyCSV {
                 ParameterizedType pType = (ParameterizedType) field.getGenericType();
                 Class clazz = (Class) pType.getActualTypeArguments()[0];
                 if(clazz.getName().startsWith("java.lang")) {
-                    sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
+                    CSVHeader csvHeader = field.getAnnotation(CSVHeader.class);
+                    if(csvHeader == null) {
+                        continue;
+                    }
+                    sb.append(csvHeader.value()).append(del);
                 } else {
                     //List<CustomObject>
                     addHeader(sb, clazz.getDeclaredFields(), false);
                 }
             } else if(field.getType().isPrimitive() || type.getName().startsWith("java.lang") || (type.isArray() && (type.getComponentType().isPrimitive() || Number.class == type.getComponentType().getSuperclass() || String.class == type.getComponentType()))) {
-                sb.append(field.getAnnotation(CSVHeader.class).value()).append(del);
+                CSVHeader csvHeader = field.getAnnotation(CSVHeader.class);
+                if(csvHeader == null) {
+                    continue;
+                }
+                sb.append(csvHeader.value()).append(del);
             } else if(type.isArray() && !type.getComponentType().isPrimitive()) {
                 //CustomObject[]
                 addHeader(sb, type.getComponentType().getDeclaredFields(), false);
