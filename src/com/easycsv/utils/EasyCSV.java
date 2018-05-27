@@ -20,7 +20,7 @@ public class EasyCSV {
         this.del = del;
     }
 
-    public String write(List<Object> objs, boolean applyHeader) {
+    public byte[] write(List<Object> objs, boolean applyHeader) throws  Exception {
         Class clazz = objs.get(0).getClass();
         Field[] fields = clazz.getDeclaredFields();
         sortFields(fields);
@@ -30,8 +30,7 @@ public class EasyCSV {
             sb.append(header).append(NEW_LINE);
         }
         sb.append(convertToCsv(objs, fields, false));
-        return Base64.getEncoder().encodeToString(sb.toString().getBytes());
-
+        return GZip.compress(Base64.getEncoder().encodeToString(sb.toString().getBytes()));
     }
 
     private StringBuilder convertToCsv(Object obj, Field[] fields, boolean isNestedObject) {

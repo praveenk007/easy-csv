@@ -1,6 +1,7 @@
 package com.easycsv.tests;
 
 import com.easycsv.utils.EasyCSV;
+import com.easycsv.utils.GZip;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -76,13 +77,17 @@ public class CsvTest {
         List list = new ArrayList();
         list.add(pd1);
         //list.add(pd2);
-        byte[] b = Base64.getDecoder().decode(t.write(list, true));
+
         FileWriter fw = null;
         try {
+            byte[] b = t.write(list, true);
+
             fw = new FileWriter(new File("/Users/praveenkamath/Documents/test.csv"));
-            fw.write(new String(b));
+            String sb = new String(Base64.getDecoder().decode(GZip.decompress(b).toString()));
+            fw.write(sb);
             fw.flush();
             System.out.println("File written");
+            System.out.println(sb);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -92,6 +97,5 @@ public class CsvTest {
                 e.printStackTrace();
             }
         }
-        System.out.println(new String(b));
     }
 }
