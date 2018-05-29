@@ -29,13 +29,36 @@ public class UserDetail {
 If you wish to ignore a field for CSV conversion, just don't add the annotations.  
 If you wish to change column order, just change the value of `@CSVHeaderPosition` annotated over the field.  
 Simple! Ain't it? :)  
-Incase of nested object (in this case, `Address`), provide `@CSVHeaderPosition` on the field and `@CSVHeaderPosition` and `@CSVHeader` on the fields inside Address.  
+In-case of nested object (in this case, `Address`), provide `@CSVHeaderPosition` on the field and `@CSVHeaderPosition` and `@CSVHeader` on the fields inside Address.  
 In-case of `List<Object>` (in this case `List<Vehicle>`), same thing as above, but only the first object inside the collection will be considered for CSV (the index to be considered won't be taken from user to avoid `ArrayIndexOutOfBoundException`).
 
 Now, let's consider a scenario where-in your object has hundreds of fields and you need to add a new field with header position 2, but that position is already taken.  
 Here it's cumbersome to update the position values of hundreds of fields just because you added a new field. So, you can just add the new field with `@CSVHeaderPosition` as 2 just above the exisiting field with position 2.
 
-Please note: I used `@CSVHeaderPosition` to sort fields as JAVA doesn't guarantee field order when using reflection.  However, when sorting fields in scenarios where we have same positions for mulitple fields, the field placement order will be considered for sorting.
+Please note: I used `@CSVHeaderPosition` to sort fields as JAVA doesn't guarantee field order when using reflection.  However, in scenarios where we have same positions for mulitple fields, the sort logic will sort all fields as per the value of `@CSVHeaderPosition`, which implies fields with same value of position will be sorted in the order in which they come from `Field[]`.  
+
+For ex.
+'''java
+public class UserDetail {
+  
+  @CSVHeader(value = "First name")
+  @CSVHeaderPosition(value = 1)
+  private String fName;
+  
+  @CSVHeader(value = "Contact number")
+  @CSVHeaderPosition(value = 3)
+  private String mobile;
+  
+  @CSVHeader(value = "Last name")
+  @CSVHeaderPosition(value = 2)
+  private String lName;
+  
+  @CSVHeader(value = "Age")
+  @CSVHeaderPosition(value = 2)
+  private List<Vehicle> vehicles;
+'''
+Headers for above will be printed as
+First name,Last name,Age,Contact number
 
 ### Supported data-types:
 ```java
