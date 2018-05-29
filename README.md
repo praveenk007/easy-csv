@@ -29,10 +29,10 @@ public class UserDetail {
 If you wish to ignore a field for CSV conversion, just don't add the annotations.  
 If you wish to change column order, just change the value of `@CSVHeaderPosition` annotated over the field.  
 Simple! Ain't it? :)  
-Incase of nested object (in this case, `Address`), provide `@CSVHeaderPosition` on the field and `@CSVHeaderPosition` and `@CSVHeader` on the fields inside Address.
+Incase of nested object (in this case, `Address`), provide `@CSVHeaderPosition` on the field and `@CSVHeaderPosition` and `@CSVHeader` on the fields inside Address.  
 In-case of `List<Object>` (in this case `List<Vehicle>`), same thing as above, but only the first object inside the collection will be considered for CSV (the index to be considered won't be taken from user to avoid `ArrayIndexOutOfBoundException`).
 
-Now, let's consider a scenario where-in your object has hundreds of fields and you need to add a new field with header position 2, but that position is already taken.
+Now, let's consider a scenario where-in your object has hundreds of fields and you need to add a new field with header position 2, but that position is already taken.  
 Here it's cumbersome to update the position values of hundreds of fields just because you added a new field. So, you can just add the new field with `@CSVHeaderPosition` as 2 just above the exisiting field with position 2.
 
 Please note: I used `@CSVHeaderPosition` to sort fields as JAVA doesn't guarantee field order when using reflection.  However, when sorting fields in scenarios where we have same positions for mulitple fields, the field placement order will be considered for sorting.
