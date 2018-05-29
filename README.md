@@ -35,7 +35,7 @@ This version comes with a function to convert collection of data into compressed
 ```java
 EasyCSV t = new EasyCSV(",");
 List<UserDetail> userDetails = new ArraysList<>();
-byte[] b = t.write(userDetails, true);
+byte[] b = t.write(userDetails, true); //pass true in 2nd arg if you want to apply header in CSV
 String data = new String(Base64.getDecoder().decode(GZip.decompress(b).toString()));
 //Do anything with this data, maybe write to a file or send it in bytes somewhere.
 ```
