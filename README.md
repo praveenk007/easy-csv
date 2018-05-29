@@ -38,7 +38,7 @@ Here it's cumbersome to update the position values of hundreds of fields just be
 Please note: I used `@CSVHeaderPosition` to sort fields as JAVA doesn't guarantee field order when using reflection.  However, in scenarios where we have same positions for mulitple fields, the sort logic will sort all fields as per the value of `@CSVHeaderPosition`, which implies fields with same value of position will be sorted in the order in which they come from `Field[]`.  
 
 For ex.
-'''java
+```java
 public class UserDetail {
   
   @CSVHeader(value = "First name")
@@ -55,8 +55,9 @@ public class UserDetail {
   
   @CSVHeader(value = "Age")
   @CSVHeaderPosition(value = 2)
-  private List<Vehicle> vehicles;
-'''
+  private int age;
+```
+
 Headers for above will be printed as
 First name,Last name,Age,Contact number
 
