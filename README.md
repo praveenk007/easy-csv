@@ -47,7 +47,7 @@ Object[], boolean[], float[], long[], double[], int[], char[], short[]
 ```
 
 ### V1.0.0.1
-This version comes with a function to convert collection of data into compressed, Base64 encoded bytes.
+This version comes with a function to convert collection of data into compressed, Base64 encoded CSV data in bytes format.
 
 #### Usage
 
