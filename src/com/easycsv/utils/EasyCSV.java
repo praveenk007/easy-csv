@@ -23,14 +23,14 @@ public class EasyCSV {
     public byte[] write(List<Object> objs, boolean applyHeader) throws  Exception {
         Class clazz = objs.get(0).getClass();
         Field[] fields = clazz.getDeclaredFields();
-        sortFields(fields);
+        FieldUtils.sortFields(fields);
         StringBuilder sb = new StringBuilder();
         if(applyHeader) {
             String header = getHeader(fields);
             sb.append(header).append(NEW_LINE);
         }
         sb.append(convertToCsv(objs, fields, false));
-        return GZip.compress(Base64.getEncoder().encodeToString(sb.toString().getBytes()));
+        return ZipUtils.compress(Base64.getEncoder().encodeToString(sb.toString().getBytes()));
     }
 
     private StringBuilder convertToCsv(Object obj, Field[] fields, boolean isNestedObject) {
@@ -65,10 +65,6 @@ public class EasyCSV {
                 .collect(Collectors.joining(del));
     }
 
-    private String getFeildValWithQualifier(String csv) {
-        return "\"" + csv +"\"";
-    }
-
     private String getHeader(Field[] fields) {
         StringBuilder sb = new StringBuilder();
         addHeader(sb, fields, true);
@@ -78,7 +74,7 @@ public class EasyCSV {
     private void addHeader(StringBuilder sb, Field[] fields, boolean isSuperClassFields) {
         if(!isSuperClassFields) {
             //Sort nested object fields
-            sortFields(fields);
+            FieldUtils.sortFields(fields);
         }
         for(Field field: fields) {
             Class type= field.getType();
@@ -119,23 +115,23 @@ public class EasyCSV {
                 if(type != null) {
                     Type clazz = type.getActualTypeArguments()[0];
                     if(String.class == clazz) { //List<String>
-                        return  getFeildValWithQualifier(((List<String>) field.get(obj)).stream().collect(Collectors.joining(del)));
+                        return  FieldUtils.surroundFieldValWithStringQualifier(((List<String>) field.get(obj)).stream().collect(Collectors.joining(del)), "\"");
                     } else if(Number.class == ((Class)clazz).getSuperclass()) { //List<Number>
-                        return  getFeildValWithQualifier(((List<Number>) field.get(obj)).stream().map(val -> String.valueOf(val)).collect(Collectors.joining(del)));
+                        return  FieldUtils.surroundFieldValWithStringQualifier(((List<Number>) field.get(obj)).stream().map(val -> String.valueOf(val)).collect(Collectors.joining(del)), "\"");
                     } else { //List<CustomObject>
                         Field[] fields = ((Class)clazz).getDeclaredFields();
-                        sortFields(fields);
+                        FieldUtils.sortFields(fields);
                         return convertToCsv(((List<Object>) field.get(obj)), fields, true).toString();
                     }
                 }
             } else if(field.getType().isArray()) {
                 Class clazz = field.getType().getComponentType();
                 if(clazz.isPrimitive() || String.class == clazz || Number.class == clazz.getSuperclass()) {
-                    return getFeildValWithQualifier(convertArrayPrimitiveToCsv(field, obj));
+                    return FieldUtils.surroundFieldValWithStringQualifier(FieldUtils.convertArrayPrimitiveToCsv(field, obj, del), "\"");
                 } else {
                     //CustomObject[]
                     Field[] fields = ((Class)clazz).getDeclaredFields();
-                    sortFields(fields);
+                    FieldUtils.sortFields(fields);
                     return convertToCsv(Array.get(field.get(obj), 0), fields, true).toString();
                 }
             } else if(field.getType().isPrimitive() || field.getType().getName().startsWith("java.lang")) {
@@ -143,43 +139,13 @@ public class EasyCSV {
             } else {
                 //custom
                 Field[] fields = field.getType().getDeclaredFields();
-                sortFields(fields);
+                FieldUtils.sortFields(fields);
                 return convertToCsv(field.get(obj), fields, true).toString();
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
         return  null;
-    }
-
-    private String convertArrayPrimitiveToCsv(Field field, Object object) {
-        StringBuilder sb;
-        try {
-            sb = new StringBuilder();
-            Object arrayObj = field.get(object);
-            for(int index = 0; index < Array.getLength(arrayObj); index++) {
-                sb.append(Array.get(arrayObj, index)).append(del);
-            } return  sb.toString().substring(0, sb.length() - 1);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-    private static void sortFields(Field[] fields) {
-        Arrays.sort(fields, new Comparator<Field>() {
-            @Override
-            public int compare(Field f1, Field f2) {
-                CSVHeaderPosition or1 = f1.getAnnotation(CSVHeaderPosition.class);
-                CSVHeaderPosition or2 = f2.getAnnotation(CSVHeaderPosition.class);
-                if (or1 != null && or2 != null) {
-                    return or1.value() - or2.value();
-                } else if (or1 != null && or2 == null) {
-                    return -1;
-                } else if (or1 == null && or2 != null) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
     }
 }
 

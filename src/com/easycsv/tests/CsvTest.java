@@ -1,7 +1,7 @@
 package com.easycsv.tests;
 
 import com.easycsv.utils.EasyCSV;
-import com.easycsv.utils.GZip;
+import com.easycsv.utils.ZipUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -83,7 +83,7 @@ public class CsvTest {
             byte[] b = t.write(list, true);
 
             fw = new FileWriter(new File("/Users/praveenkamath/Documents/test.csv"));
-            String sb = new String(Base64.getDecoder().decode(GZip.decompress(b).toString()));
+            String sb = new String(Base64.getDecoder().decode(ZipUtils.decompress(b).toString()));
             fw.write(sb);
             fw.flush();
             System.out.println("File written");

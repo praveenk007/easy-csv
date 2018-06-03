@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class GZip {
+public class ZipUtils {
 
     public static byte[] compress(String data) throws Exception {
         byte[] compressed;
