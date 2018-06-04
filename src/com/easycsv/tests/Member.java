@@ -52,4 +52,14 @@ public class Member {
     public void setLname(String lname) {
         this.lname = lname;
     }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "fname='" + fname + '\'' +
+                ", lname='" + lname + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", address=" + address +
+                '}';
+    }
 }

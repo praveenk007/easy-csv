@@ -10,7 +10,7 @@ import java.util.List;
 public class ZippedFileWriter implements ICSVFileWriter {
 
     @Override
-    public void write(List<Object> objects) {
+    public void write() {
 
     }
 }

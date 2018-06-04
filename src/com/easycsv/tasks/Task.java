@@ -21,7 +21,7 @@ public class Task implements Callable<Integer> {
         } else {
             Thread.sleep(4000);
         }
-        System.out.println("Thread executing :: " + Thread.currentThread().getName());
+        System.out.println("Thread executing :: " + Thread.currentThread().getName() + ", work :: " + objs.size() + ", " +objs.get(0) + " " + objs.get(objs.size()-1));
         return 123;
     }
 }
