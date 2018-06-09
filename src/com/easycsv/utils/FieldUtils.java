@@ -27,6 +27,9 @@ public class FieldUtils {
 
 
     public static String surroundFieldValWithStringQualifier(String csv, String qualifier) {
+        if(csv == null) {
+            csv = "-";
+        }
         return qualifier + csv + qualifier;
     }
 

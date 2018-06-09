@@ -2,7 +2,9 @@ package com.easycsv.tests;
 
 import com.easycsv.annotations.CSVHeader;
 import com.easycsv.annotations.CSVHeaderPosition;
+import com.easycsv.annotations.CSVProperties;
 
+@CSVProperties(defaultValue = "-")
 public class Member {
 
     @CSVHeaderPosition(value = 2)

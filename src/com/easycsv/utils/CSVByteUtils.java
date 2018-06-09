@@ -10,13 +10,13 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class EasyCSV {
+public class CSVByteUtils {
 
     private String del;
 
     private static final String NEW_LINE    =   "\n";
 
-    public EasyCSV(String del) {
+    public CSVByteUtils(String del) {
         this.del = del;
     }
 

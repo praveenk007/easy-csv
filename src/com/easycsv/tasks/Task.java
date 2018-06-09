@@ -1,5 +1,8 @@
 package com.easycsv.tasks;
 
+import com.easycsv.interfaces.CSVServiceImpl;
+import com.easycsv.services.ICSVService;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -8,20 +11,25 @@ import java.util.concurrent.Callable;
  **/
 public class Task implements Callable<Integer> {
 
-    private List<Object> objs;
+    private List<Object>    objs;
 
-    public Task(List<Object> objs) {
-        this.objs = objs;
+    private String          path;
+
+    private boolean         applyHeader;
+
+    private ICSVService     csvService;
+
+    public Task(List<Object> objs, String path, boolean applyHeader) {
+        this.objs           =   objs;
+        this.path           =   path;
+        this.applyHeader    =   applyHeader;
+        this.csvService     =   new CSVServiceImpl();
     }
 
     @Override
     public Integer call() throws Exception {
-        if (Thread.currentThread().getName().equalsIgnoreCase("pool-1-thread-2")) {
-            Thread.sleep(10000);
-        } else {
-            Thread.sleep(4000);
-        }
-        System.out.println("Thread executing :: " + Thread.currentThread().getName() + ", work :: " + objs.size() + ", " +objs.get(0) + " " + objs.get(objs.size()-1));
+        //System.out.println("[call] Thread :: "+ Thread.currentThread().getName());
+        csvService.writeToFile(objs, path, applyHeader);
         return 123;
     }
 }

@@ -1,6 +1,6 @@
 package com.easycsv.tests;
 
-import com.easycsv.utils.EasyCSV;
+import com.easycsv.utils.CSVByteUtils;
 import com.easycsv.utils.ZipUtils;
 
 import java.io.File;
@@ -15,7 +15,7 @@ public class CsvTest {
 
 
 
-        EasyCSV t = new EasyCSV(",");
+        CSVByteUtils t = new CSVByteUtils(",");
 
         PolicyDetails pd1 = new PolicyDetails();
         pd1.setfName("praveen");
