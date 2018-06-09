@@ -87,3 +87,30 @@ Memory management and file write will be supported in next version.
 
 ### Disclaimer
 This version is still in testing phase (basic testing with small data has been done).
+
+### V2.0.0.0 - Multithreaded data processing and file writes
+Added an implementation ##for parallel processing and file writes##. Here's how this feature works:
+1. Utility divides `List<Object>` into n buckets (specified by client) with capacity `list.size() / n` each
+2. All buckets are then sent for processing (file creation) asynchronously
+3. The files are then zipped for compression. The path is provided to the user
+
+#### Usage
+
+```java
+List<Object> objects  = getThisObjFromNoMansLand();
+String dir            = "/Users/abc/xyz/testcsv";
+ICSVFileWriter z      = new ParallelZippedFileWriter(13, objects, dir, true);
+Result result         = z.writeAndZip();
+System.out.println(result)
+```
+Result:
+
+```java
+Result{taskMetas=[TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-1.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-2.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-3.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-4.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-5.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-6.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-7.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-8.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-9.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-10.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-11.csv'}, TaskMeta{records=939, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-12.csv'}, TaskMeta{records=945, status=200, message='null', filePath='/Users/praveenkamath/Documents/testcsv/WDUBX/bucket-13.csv'}], status=200, message='null', zipPath='/Users/praveenkamath/Documents/testcsv/WDUBX.zip'}
+```
+
+#### Benefits of using this
+1. Files are compressed, so less space consumption (as per tests conducted by me, 13 files of size 15kb each where compressed into single zip file of size 25 kb). Also, in requirements where-in client downloads large data, zipped file can be made downloadable to client rather than a huge file, which is time consuming
+2. Files are created asynchronously, so time consumption is less for large data.
+
+Also, added an extra annotation `@CSVProperties` with `defaultValue` method. Use this annotation at class level to denote the default value to be used when field value is null.
