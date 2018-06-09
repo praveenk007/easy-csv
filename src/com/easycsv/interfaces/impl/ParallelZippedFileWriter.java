@@ -67,6 +67,7 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
             if(executor != null && !executor.isShutdown()) {
                 executor.shutdown();
             }
+            System.out.println(FileUtils.deleteDir(tempDir));
         }
     }
 

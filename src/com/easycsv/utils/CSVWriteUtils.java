@@ -3,6 +3,7 @@ package com.easycsv.utils;
 import com.easycsv.annotations.CSVHeader;
 import com.easycsv.annotations.CSVHeaderPosition;
 import com.easycsv.annotations.CSVProperties;
+import com.easycsv.constants.Constants;
 
 import java.io.BufferedWriter;
 import java.lang.reflect.Array;
@@ -20,8 +21,6 @@ public class CSVWriteUtils {
 
     private String del;
 
-    private static final String NEW_LINE    =   "\n";
-
     private static String DEFAULT_VAL       =   "";
 
     public CSVWriteUtils(String del) {
@@ -38,7 +37,7 @@ public class CSVWriteUtils {
 
         FieldUtils.sortFields(fields);
         if(applyHeader) {
-            writer.write(getHeader(fields) + NEW_LINE);
+            writer.write(getHeader(fields) + Constants.NEW_LINE);
         }
         convertToCsv(writer, objs, fields, false);
     }
@@ -60,7 +59,7 @@ public class CSVWriteUtils {
         try {
             sb.append(stringifyObjectFields(obj, fields));
             if(!isNestedObject)
-                sb.append(NEW_LINE);
+                sb.append(Constants.NEW_LINE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,7 +69,7 @@ public class CSVWriteUtils {
         try {
             writer.write(stringifyObjectFields(obj, fields));
             if(!isNestedObject)
-                writer.write(NEW_LINE);
+                writer.write(Constants.NEW_LINE);
         } catch (Exception e) {
             e.printStackTrace();
         }
