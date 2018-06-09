@@ -93,6 +93,7 @@ Added an implementation ##for parallel processing and file writes##. Here's how 
 1. Utility divides `List<Object>` into n buckets (specified by client) with capacity `list.size() / n` each
 2. All buckets are then sent for processing (file creation) asynchronously
 3. The files are then zipped for compression. The path is provided to the user
+4. Once zip creation is done, all files created in above process are deleted
 
 #### Usage
 
