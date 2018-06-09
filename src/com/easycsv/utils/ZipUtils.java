@@ -1,11 +1,13 @@
 package com.easycsv.utils;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ZipUtils {
 
@@ -33,5 +35,22 @@ public class ZipUtils {
                 sb.append(line);
             }
         } return sb;
+    }
+
+    public static void zipThem(List<String> filePaths, String zipPath) {
+        try(FileOutputStream fos = new FileOutputStream(zipPath);ZipOutputStream zos = new ZipOutputStream(fos) ) {
+            filePaths.forEach(filePath -> {
+                try {
+                    zos.putNextEntry(new ZipEntry(new File(filePath).getName()));
+                    byte[] bytes = Files.readAllBytes(Paths.get(filePath));
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

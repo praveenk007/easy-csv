@@ -1,15 +1,19 @@
 package com.easycsv.tasks;
 
 import com.easycsv.interfaces.CSVServiceImpl;
+import com.easycsv.models.Result;
+import com.easycsv.models.TaskMeta;
 import com.easycsv.services.ICSVService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
+ * This class
+ *
  * @author praveenkamath
  **/
-public class Task implements Callable<Integer> {
+public class Task implements Callable<TaskMeta> {
 
     private List<Object>    objs;
 
@@ -27,9 +31,23 @@ public class Task implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public TaskMeta call() {
         //System.out.println("[call] Thread :: "+ Thread.currentThread().getName());
-        csvService.writeToFile(objs, path, applyHeader);
-        return 123;
+        try {
+            csvService.writeToFile(objs, path, applyHeader);
+            return new TaskMeta(objs.size(), 200, null, path);
+        } catch (Exception e) {
+            return new TaskMeta(0, 500, e.getMessage(), null);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "objs=" + objs +
+                ", path='" + path + '\'' +
+                ", applyHeader=" + applyHeader +
+                ", csvService=" + csvService +
+                '}';
     }
 }

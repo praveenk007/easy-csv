@@ -1,8 +1,7 @@
 package com.easycsv.interfaces.impl;
 
 import com.easycsv.interfaces.ICSVFileWriter;
-
-import java.util.List;
+import com.easycsv.models.Result;
 
 /**
  * @author praveenkamath
@@ -10,7 +9,7 @@ import java.util.List;
 public class ZippedFileWriter implements ICSVFileWriter {
 
     @Override
-    public void write() {
-
+    public Result writeAndZip() {
+        return null;
     }
 }

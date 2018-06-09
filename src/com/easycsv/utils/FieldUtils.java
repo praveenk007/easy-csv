@@ -8,10 +8,19 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
+ * Reflection based field utility. Can be used to process class fields.
+ *
  * @author praveenkamath
  **/
 public class FieldUtils {
 
+    /**
+     * Converts array of primitive data-types into CSV string
+     * @param field
+     * @param object
+     * @param delimiter
+     * @return
+     */
     public static String convertArrayPrimitiveToCsv(Field field, Object object, String delimiter) {
         StringBuilder sb;
         try {
@@ -25,7 +34,12 @@ public class FieldUtils {
         }
     }
 
-
+    /**
+     * Surrounds a field value with specified qualifier
+     * @param csv field value
+     * @param qualifier
+     * @return
+     */
     public static String surroundFieldValWithStringQualifier(String csv, String qualifier) {
         if(csv == null) {
             csv = "-";
@@ -33,7 +47,10 @@ public class FieldUtils {
         return qualifier + csv + qualifier;
     }
 
-
+    /**
+     * Sorts all fields based on position specified in field annotation
+     * @param fields
+     */
     public static void sortFields(Field[] fields) {
         Arrays.sort(fields, new Comparator<Field>() {
             @Override

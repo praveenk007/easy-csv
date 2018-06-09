@@ -1,17 +1,19 @@
 package com.easycsv.interfaces.impl;
 
+import com.easycsv.constants.Constants;
+import com.easycsv.enums.FileFormatEnum;
 import com.easycsv.interfaces.ICSVFileWriter;
+import com.easycsv.models.Result;
+import com.easycsv.models.TaskMeta;
 import com.easycsv.tasks.Task;
-import com.easycsv.tests.Member;
 import com.easycsv.utils.FileUtils;
 import com.easycsv.utils.RandomIdGenerator;
-
+import com.easycsv.utils.ZipUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * This implementation divides list of objects into blocks.
@@ -30,6 +32,13 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
 
     private boolean         applyHeader;
 
+    /**
+     *
+     * @param buckets       number of files
+     * @param objects       List of records to print
+     * @param dir           root directory to write temp files and zip file
+     * @param applyHeader   denotes whether to apply header or not
+     */
     public ParallelZippedFileWriter(int buckets, List<Object> objects, String dir, boolean applyHeader) {
         this.buckets        =   buckets;
         this.objects        =   objects;
@@ -38,30 +47,22 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
     }
 
     @Override
-    public void write() {
+    public Result writeAndZip() {
         int bucketCapacity = getBucketCapacity();
-        System.out.println("Bucket cap :: "+bucketCapacity);
         int size = objects.size();
-        List<Callable<Integer>> calls = new ArrayList<>();
-        String tempDir = dir + File.separator + RandomIdGenerator.randomAlphaNumeric(5);
-        boolean isDirCreated = FileUtils.mkDir(tempDir);
-        if(!isDirCreated) {
-            FileUtils.mkDir(dir);
-        }
-        for(int index = 0; index < buckets; index ++) {
-            String path = tempDir + File.separator + "bucket-" + (index+1) + ".csv";
-            if(index == buckets-1 && size % buckets > 0) { //&& size % buckets < bucketCapacity / 2) {
-                calls.add(new Task(objects.subList(index * bucketCapacity, size), path, applyHeader));
-            } else {
-                calls.add(new Task(objects.subList(index * bucketCapacity, (index + 1) * bucketCapacity), path, applyHeader));
-            }
-        }
+        String id = RandomIdGenerator.randomAlphaNumeric(5);
+        String zipPath  =   dir + File.separator + id + ".zip";
+        String tempDir = dir + File.separator + id;
+        FileUtils.mkDir(tempDir);
         ExecutorService executor = Executors.newFixedThreadPool(buckets);
         try {
-            executor.invokeAll(calls);
-            System.out.println("done");
+            List<Future<TaskMeta>> futures = executor.invokeAll(createTasks(tempDir, size, bucketCapacity));
+            List<TaskMeta> taskMetas = getResultsFromFutures(futures);
+            zip(taskMetas, zipPath);
+            return new Result(taskMetas, 200, null, zipPath);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            return new Result(null, 500, e.getMessage(), null);
         } finally {
             if(executor != null && !executor.isShutdown()) {
                 executor.shutdown();
@@ -69,23 +70,62 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
         }
     }
 
+    /**
+     * Collects result of all async tasks
+     * @param futures
+     * @return List of task metas
+     */
+    private List<TaskMeta> getResultsFromFutures(List<Future<TaskMeta>> futures) {
+        return futures.stream().map(f-> {
+            try {
+                return f.get();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        })  .filter(taskMeta -> taskMeta != null)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Zips all buckets/files
+     * @param results results of all async tasks
+     * @param zipPath path to create zip file
+     */
+    private void zip(List<TaskMeta> results, String zipPath) {
+        List<String> paths = results.stream()
+                .filter(result -> result.getStatus() == 200)
+                .map(result -> result.getFilePath())
+                .collect(Collectors.toList());
+        ZipUtils.zipThem(paths, zipPath);
+    }
+
+    /**
+     * Creates a list of async tasks
+     * @param tempDir
+     * @param totalRecords
+     * @param bucketCapacity
+     * @return
+     */
+    private List<Callable<TaskMeta>> createTasks(String tempDir, int totalRecords, int bucketCapacity) {
+        List<Callable<TaskMeta>> calls = new ArrayList<>();
+        for(int index = 0; index < buckets; index ++) {
+            String path = tempDir + File.separator + "bucket-" + (index+1) + Constants.DOT + FileFormatEnum.csv;
+            if(index == buckets-1 && totalRecords % buckets > 0) { //&& size % buckets < bucketCapacity / 2) {
+                calls.add(new Task(objects.subList(index * bucketCapacity, totalRecords), path, applyHeader));
+            } else {
+                calls.add(new Task(objects.subList(index * bucketCapacity, (index + 1) * bucketCapacity), path, applyHeader));
+            }
+        } return calls;
+    }
+
+    /**
+     * Calculates capacity of a bucket/file
+     * @return
+     */
     private int getBucketCapacity() {
         if(objects == null || objects.isEmpty()) {
             return 0;
         } return (objects.size() / buckets);
-    }
-
-    public static void main(String args[]) {
-        List<Object> objects = new ArrayList<>();
-        for(int index = 0; index < 12213; index++) {
-            Member mem = new Member();
-            mem.setFname("pk"+index);
-            objects.add(mem);
-        }
-        String dir = "/Users/praveenkamath/Documents/testcsv";
-        ParallelZippedFileWriter z = new ParallelZippedFileWriter(13, objects, dir, true);
-        long start = System.currentTimeMillis();
-        z.write();
-        System.out.println("Total time : " + (System.currentTimeMillis() - start) );
     }
 }
