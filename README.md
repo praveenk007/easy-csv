@@ -89,7 +89,7 @@ Memory management and file write will be supported in next version.
 This version is still in testing phase (basic testing with small data has been done).
 
 ### V2.0.0.0 - Multithreaded data processing and file writes
-Added an implementation for parallel processing and file writes. Here's how this feature works:
+Added an implementation for **parallel processing and file writes**. Here's how this feature works:
 1. Utility divides `List<Object>` into n buckets (specified by client) with capacity `list.size() / n` each
 2. All buckets are then sent for processing (file creation) asynchronously
 3. The files are then zipped for compression. The path is provided to the user
