@@ -76,7 +76,7 @@ This version comes with a function to convert collection of data into compressed
 #### Usage
 
 ```java
-EasyCSV t = new EasyCSV(",");
+CSVByteUtils t = new CSVByteUtils(",");
 List<UserDetail> userDetails = new ArraysList<>();
 byte[] b = t.write(userDetails, true); //pass true in 2nd arg if you want to apply header in CSV
 String data = new String(Base64.getDecoder().decode(GZip.decompress(b).toString()));
@@ -84,9 +84,6 @@ String data = new String(Base64.getDecoder().decode(GZip.decompress(b).toString(
 ```
 As of now, it's upto the caller to manage memory by sending data in chunks.  
 Memory management and file write will be supported in next version.
-
-### Disclaimer
-This version is still in testing phase (basic testing with small data has been done).
 
 ### V2.0.0.0 - Multithreaded data processing and file writes
 Added an implementation for **parallel processing and file writes**. Here's how this feature works:
