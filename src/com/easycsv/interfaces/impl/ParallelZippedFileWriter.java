@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This implementation divides list of objects into blocks.
@@ -110,14 +111,14 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
      */
     private List<Callable<TaskMeta>> createTasks(String tempDir, int totalRecords, int bucketCapacity) {
         List<Callable<TaskMeta>> calls = new ArrayList<>();
-        for(int index = 0; index < buckets; index ++) {
+        IntStream.range(0, buckets).forEach(index -> {
             String path = tempDir + File.separator + "bucket-" + (index+1) + Constants.DOT + FileFormatEnum.csv;
-            if(index == buckets-1 && totalRecords % buckets > 0) { //&& size % buckets < bucketCapacity / 2) {
+            if(index == buckets - 1 && totalRecords % buckets > 0) {
                 calls.add(new Task(objects.subList(index * bucketCapacity, totalRecords), path, applyHeader));
             } else {
                 calls.add(new Task(objects.subList(index * bucketCapacity, (index + 1) * bucketCapacity), path, applyHeader));
             }
-        } return calls;
+        }); return calls;
     }
 
     /**
@@ -125,8 +126,6 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
      * @return
      */
     private int getBucketCapacity() {
-        if(objects == null || objects.isEmpty()) {
-            return 0;
-        } return (objects.size() / buckets);
+        return objects == null || objects.isEmpty() ? 0 : objects.size() / buckets;
     }
 }
