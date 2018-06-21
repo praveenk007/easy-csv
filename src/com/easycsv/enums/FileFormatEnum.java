@@ -5,5 +5,6 @@ package com.easycsv.enums;
  **/
 public enum FileFormatEnum {
 
-    csv;
+    csv,
+    zip;
 }

@@ -52,7 +52,7 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
         int bucketCapacity = getBucketCapacity();
         int size = objects.size();
         String id = RandomIdGenerator.randomAlphaNumeric(5);
-        String zipPath  =   dir + File.separator + id + ".zip";
+        String zipPath  =   dir + File.separator + id + FileFormatEnum.zip;
         String tempDir = dir + File.separator + id;
         FileUtils.mkDir(tempDir);
         ExecutorService executor = Executors.newFixedThreadPool(buckets);
