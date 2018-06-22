@@ -94,27 +94,29 @@ public class CSVWriteUtils {
             //Sort nested object fields
             FieldUtils.sortFields(fields);
         }
-        for(Field field: fields) {
+        //
+        Arrays.stream(fields).forEach(field -> addHeader(sb, field));
+    }
+
+    private void addHeader(StringBuilder sb, Field field) {
             Class type= field.getType();
             if(List.class == type) {
                 ParameterizedType pType = (ParameterizedType) field.getGenericType();
                 Class clazz = (Class) pType.getActualTypeArguments()[0];
                 if(clazz.getName().startsWith("java.lang")) {
                     CSVHeader csvHeader = field.getAnnotation(CSVHeader.class);
-                    if(csvHeader == null) {
-                        continue;
+                    if(csvHeader != null) {
+                        sb.append(csvHeader.value()).append(del);
                     }
-                    sb.append(csvHeader.value()).append(del);
                 } else {
                     //List<CustomObject>
                     addHeader(sb, clazz.getDeclaredFields(), false);
                 }
             } else if(field.getType().isPrimitive() || type.getName().startsWith("java.lang") || (type.isArray() && (type.getComponentType().isPrimitive() || Number.class == type.getComponentType().getSuperclass() || String.class == type.getComponentType()))) {
                 CSVHeader csvHeader = field.getAnnotation(CSVHeader.class);
-                if(csvHeader == null) {
-                    continue;
+                if(csvHeader != null) {
+                    sb.append(csvHeader.value()).append(del);
                 }
-                sb.append(csvHeader.value()).append(del);
             } else if(type.isArray() && !type.getComponentType().isPrimitive()) {
                 //CustomObject[]
                 addHeader(sb, type.getComponentType().getDeclaredFields(), false);
@@ -122,7 +124,6 @@ public class CSVWriteUtils {
                 //CustomObject
                 addHeader(sb, field.getType().getDeclaredFields(), false);
             }
-        }
     }
 
     private String getFieldVal(Field field, Object obj) {

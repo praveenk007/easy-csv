@@ -19,9 +19,9 @@ public class ParallelWrites {
             objects.add(mem);
         }
         String dir = "/Users/praveenkamath/Documents/testcsv";
-        ICSVFileWriter z = new ParallelZippedFileWriter(1, objects, dir, true);
+        ICSVFileWriter z = new ParallelZippedFileWriter(objects, true);
         long start = System.currentTimeMillis();
-        System.out.println(z.writeAndZip());
+        System.out.println(z.splitAndZip(10, dir));
         System.out.println("Total time : " + (System.currentTimeMillis() - start) );
     }
 }

@@ -13,5 +13,5 @@ public interface ICSVFileWriter {
      * Creates files and zips them
      * @return
      */
-    Result writeAndZip();
+    Result splitAndZip(int buckets, String directory);
 }

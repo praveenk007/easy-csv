@@ -25,39 +25,31 @@ import java.util.stream.IntStream;
  **/
 public class ParallelZippedFileWriter implements ICSVFileWriter {
 
-    private int             buckets;
-
     private List<Object>    objects;
-
-    private String          dir;
 
     private boolean         applyHeader;
 
     /**
      *
-     * @param buckets       number of files
      * @param objects       List of records to print
-     * @param dir           root directory to write temp files and zip file
      * @param applyHeader   denotes whether to apply header or not
      */
-    public ParallelZippedFileWriter(int buckets, List<Object> objects, String dir, boolean applyHeader) {
-        this.buckets        =   buckets;
+    public ParallelZippedFileWriter(List<Object> objects, boolean applyHeader) {
         this.objects        =   objects;
-        this.dir            =   dir;
         this.applyHeader    =   applyHeader;
     }
 
     @Override
-    public Result writeAndZip() {
-        int bucketCapacity = getBucketCapacity();
+    public Result splitAndZip(int buckets, String dir) {
+        int bucketCapacity = getBucketCapacity(buckets);
         int size = objects.size();
         String id = RandomIdGenerator.randomAlphaNumeric(5);
-        String zipPath  =   dir + File.separator + id + FileFormatEnum.zip;
+        String zipPath  =   dir + File.separator + id + Constants.DOT + FileFormatEnum.zip;
         String tempDir = dir + File.separator + id;
         FileUtils.mkDir(tempDir);
         ExecutorService executor = Executors.newFixedThreadPool(buckets);
         try {
-            List<Future<TaskMeta>> futures = executor.invokeAll(createTasks(tempDir, size, bucketCapacity));
+            List<Future<TaskMeta>> futures = executor.invokeAll(createTasks(tempDir, size, bucketCapacity, buckets));
             List<TaskMeta> taskMetas = getResultsFromFutures(futures);
             zip(taskMetas, zipPath);
             return new Result(taskMetas, 200, null, zipPath);
@@ -109,7 +101,7 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
      * @param bucketCapacity
      * @return
      */
-    private List<Callable<TaskMeta>> createTasks(String tempDir, int totalRecords, int bucketCapacity) {
+    private List<Callable<TaskMeta>> createTasks(String tempDir, int totalRecords, int bucketCapacity, int buckets) {
         List<Callable<TaskMeta>> calls = new ArrayList<>();
         IntStream.range(0, buckets).forEach(index -> {
             String path = tempDir + File.separator + "bucket-" + (index+1) + Constants.DOT + FileFormatEnum.csv;
@@ -125,7 +117,7 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
      * Calculates capacity of a bucket/file
      * @return
      */
-    private int getBucketCapacity() {
+    private int getBucketCapacity(int buckets) {
         return objects == null || objects.isEmpty() ? 0 : objects.size() / buckets;
     }
 }

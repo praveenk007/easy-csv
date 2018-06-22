@@ -9,7 +9,7 @@ import com.easycsv.models.Result;
 public class ZippedFileWriter implements ICSVFileWriter {
 
     @Override
-    public Result writeAndZip() {
+    public Result splitAndZip(int buckets, String directory) {
         return null;
     }
 }

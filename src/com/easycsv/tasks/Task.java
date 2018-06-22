@@ -32,7 +32,6 @@ public class Task implements Callable<TaskMeta> {
 
     @Override
     public TaskMeta call() {
-        //System.out.println("[call] Thread :: "+ Thread.currentThread().getName());
         try {
             csvService.writeToFile(objs, path, applyHeader);
             return new TaskMeta(objs.size(), 200, null, path);
