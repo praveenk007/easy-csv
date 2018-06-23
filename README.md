@@ -70,21 +70,6 @@ List<Object>
 Object[], boolean[], float[], long[], double[], int[], char[], short[]
 ```
 
-### V1.0.0.1
-This version comes with a function to convert collection of data into compressed, Base64 encoded CSV data in bytes format.
-
-#### Usage
-
-```java
-CSVByteUtils t = new CSVByteUtils(",");
-List<UserDetail> userDetails = new ArraysList<>();
-byte[] b = t.write(userDetails, true); //pass true in 2nd arg if you want to apply header in CSV
-String data = new String(Base64.getDecoder().decode(GZip.decompress(b).toString()));
-//Do anything with this data, maybe write to a file or send it in bytes somewhere.
-```
-As of now, it's upto the caller to manage memory by sending data in chunks.  
-Memory management and file write will be supported in next version.
-
 ### V2.0.0.0 - Multithreaded data processing and file writes
 Added an implementation for **parallel processing and file writes**. Here's how this feature works:
 1. Utility divides `List<Object>` into n buckets (specified by client) with capacity `list.size() / n` each
@@ -112,3 +97,19 @@ Result{taskMetas=[TaskMeta{records=939, status=200, message='null', filePath='/U
 2. Files are created asynchronously, so time consumption is less for large data.
 
 Also, added an extra annotation `@CSVProperties` with `defaultValue` method. Use this annotation at class level to denote the default value to be used when field value is null.
+
+
+### V1.0.0.1
+This version comes with a function to convert collection of data into compressed, Base64 encoded CSV data in bytes format.
+
+#### Usage
+
+```java
+CSVByteUtils t = new CSVByteUtils(",");
+List<UserDetail> userDetails = new ArraysList<>();
+byte[] b = t.write(userDetails, true); //pass true in 2nd arg if you want to apply header in CSV
+String data = new String(Base64.getDecoder().decode(GZip.decompress(b).toString()));
+//Do anything with this data, maybe write to a file or send it in bytes somewhere.
+```
+As of now, it's upto the caller to manage memory by sending data in chunks.
+Memory management and file write will be supported in next version.
