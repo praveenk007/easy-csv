@@ -1,6 +1,9 @@
 package main.com.easycsv.interfaces;
 
 import main.com.easycsv.models.Result;
+import main.com.easycsv.models.Results;
+
+import java.io.BufferedWriter;
 
 /**
  * A contract which defines different file write implementations
@@ -13,5 +16,8 @@ public interface ICSVFileWriter {
      * Creates files and zips them
      * @return
      */
-    Result splitAndZip(int buckets, String directory);
+    Results createManyThenZip(int buckets, String directory);
+
+
+    Result createOneThenZip(BufferedWriter writer);
 }

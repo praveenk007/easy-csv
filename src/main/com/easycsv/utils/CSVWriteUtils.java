@@ -38,6 +38,7 @@ public class CSVWriteUtils {
         FieldUtils.sortFields(fields);
         if(applyHeader) {
             writer.write(getHeader(fields) + Constants.NEW_LINE);
+            writer.flush();
         }
         convertToCsv(writer, objs, fields, false);
     }
@@ -48,9 +49,10 @@ public class CSVWriteUtils {
         return sb;
     }
 
-    private void convertToCsv(BufferedWriter writer, List<Object> objs, Field[] fields, boolean isNestedObject) {
+    private void convertToCsv(BufferedWriter writer, List<Object> objs, Field[] fields, boolean isNestedObject) throws Exception {
         for(Object obj: objs) {
             appendDataToCsv(writer, obj, fields, isNestedObject);
+            writer.flush();
         }
     }
 

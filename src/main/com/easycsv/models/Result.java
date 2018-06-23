@@ -7,23 +7,28 @@ import java.util.List;
  **/
 public class Result {
 
-    public Result() {
-    }
-
-    public Result(List<TaskMeta> taskMetas, int status, String message, String zipPath) {
-        this.taskMetas = taskMetas;
-        this.status = status;
-        this.message = message;
-        this.zipPath = zipPath;
-    }
-
-    private List<TaskMeta> taskMetas;
+    private TaskMeta taskMeta;
 
     private int     status;
 
     private String  message;
 
     private String  zipPath;
+
+    public Result(TaskMeta taskMeta, int status, String message, String zipPath) {
+        this.taskMeta   = taskMeta;
+        this.status     = status;
+        this.message    = message;
+        this.zipPath    = zipPath;
+    }
+
+    public TaskMeta getTaskMeta() {
+        return taskMeta;
+    }
+
+    public void setTaskMeta(TaskMeta taskMeta) {
+        this.taskMeta = taskMeta;
+    }
 
     public int getStatus() {
         return status;
@@ -47,23 +52,5 @@ public class Result {
 
     public void setZipPath(String zipPath) {
         this.zipPath = zipPath;
-    }
-
-    public List<TaskMeta> getTaskMetas() {
-        return taskMetas;
-    }
-
-    public void setTaskMetas(List<TaskMeta> taskMetas) {
-        this.taskMetas = taskMetas;
-    }
-
-    @Override
-    public String toString() {
-        return "Result{" +
-                "taskMetas=" + taskMetas +
-                ", status=" + status +
-                ", message='" + message + '\'' +
-                ", zipPath='" + zipPath + '\'' +
-                '}';
     }
 }

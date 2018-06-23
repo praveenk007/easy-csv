@@ -1,9 +1,9 @@
 package main.com.easycsv.interfaces.impl;
 
+import main.com.easycsv.abstracts.AbstractBaseWriter;
 import main.com.easycsv.constants.Constants;
 import main.com.easycsv.enums.FileFormatEnum;
-import main.com.easycsv.interfaces.ICSVFileWriter;
-import main.com.easycsv.models.Result;
+import main.com.easycsv.models.Results;
 import main.com.easycsv.models.TaskMeta;
 import main.com.easycsv.tasks.Task;
 import main.com.easycsv.utils.FileUtils;
@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
  *
  * @author praveenkamath
  **/
-public class ParallelZippedFileWriter implements ICSVFileWriter {
+public class ParallelZippedFileWriter extends AbstractBaseWriter {
 
     private List<Object>    objects;
 
@@ -40,7 +40,7 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
     }
 
     @Override
-    public Result splitAndZip(int buckets, String dir) {
+    public Results createManyThenZip(int buckets, String dir) {
         int bucketCapacity = getBucketCapacity(buckets);
         int size = objects.size();
         String id = RandomIdGenerator.randomAlphaNumeric(5);
@@ -52,15 +52,15 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
             List<Future<TaskMeta>> futures = executor.invokeAll(createTasks(tempDir, size, bucketCapacity, buckets));
             List<TaskMeta> taskMetas = getResultsFromFutures(futures);
             zip(taskMetas, zipPath);
-            return new Result(taskMetas, 200, null, zipPath);
+            return new Results(taskMetas, 200, null, zipPath);
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return new Result(null, 500, e.getMessage(), null);
+            return new Results(null, 500, e.getMessage(), null);
         } finally {
             if(executor != null && !executor.isShutdown()) {
                 executor.shutdown();
             }
-            System.out.println(FileUtils.deleteDir(tempDir));
+            FileUtils.deleteDir(tempDir);
         }
     }
 

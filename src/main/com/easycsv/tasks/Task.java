@@ -1,8 +1,8 @@
 package main.com.easycsv.tasks;
 
-import main.com.easycsv.interfaces.CSVServiceImpl;
+import main.com.easycsv.interfaces.impl.CSVServiceImpl;
 import main.com.easycsv.models.TaskMeta;
-import main.com.easycsv.services.ICSVService;
+import main.com.easycsv.interfaces.ICSVService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
