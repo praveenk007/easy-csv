@@ -105,11 +105,10 @@ public class ParallelZippedFileWriter implements ICSVFileWriter {
         List<Callable<TaskMeta>> calls = new ArrayList<>();
         IntStream.range(0, buckets).forEach(index -> {
             String path = tempDir + File.separator + "bucket-" + (index+1) + Constants.DOT + FileFormatEnum.csv;
-            if(index == buckets - 1 && totalRecords % buckets > 0) {
-                calls.add(new Task(objects.subList(index * bucketCapacity, totalRecords), path, applyHeader));
-            } else {
-                calls.add(new Task(objects.subList(index * bucketCapacity, (index + 1) * bucketCapacity), path, applyHeader));
-            }
+             calls.add(index == buckets - 1 && totalRecords % buckets > 0 ?
+                     new Task(objects.subList(index * bucketCapacity, totalRecords), path, applyHeader) :
+                     new Task(objects.subList(index * bucketCapacity, (index + 1) * bucketCapacity), path, applyHeader)
+            );
         }); return calls;
     }
 
